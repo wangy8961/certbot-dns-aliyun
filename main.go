@@ -123,6 +123,10 @@ func main() {
 		addDomainRecord(client, domainName, value)
 
 		// Sleep to make sure the change has time to propagate over to DNS
+		/* 否则报错:
+		   Attempting to renew cert (madmalls.com) from /etc/letsencrypt/renewal/madmalls.com.conf produced an unexpected error: Failed authorization procedure. madmalls.com (dns-01): urn:ietf:params:acme:error:dns :: DNS problem: NXDOMAIN looking up TXT for _acme-challenge.madmalls.com - check that a DNS record exists for this domain. Skipping.All renewal attempts failed. The following certs could not be renewed:
+		   /etc/letsencrypt/live/madmalls.com/fullchain.pem (failure)
+		*/
 		time.Sleep(30 * time.Second)
 	case "cleanup":
 		// 先获取所有记录类型为 TXT，且记录名包含 '_acme-challenge' 的记录 ID
