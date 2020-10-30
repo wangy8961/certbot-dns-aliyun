@@ -48,7 +48,7 @@ func addDomainRecord(client *alidns.Client, domainName string, value string) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	fmt.Printf("[%s] Response from 'addDomainRecord()' is %#v\n", time.Now().Format("2006-01-02 15:04:05"), response)
+	fmt.Printf("[%s] Response from 'addDomainRecord()' is %v\n", time.Now().Format("2006-01-02 15:04:05"), response)
 }
 
 // 列出所有记录类型为 TXT，且记录名包含 '_acme-challenge' 的所有记录，返回 recordID 组成的切片，后续删除它们
@@ -63,7 +63,7 @@ func listDomainRecords(client *alidns.Client, domainName string) []string {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	fmt.Printf("[%s] Response from 'listDomainRecords()' is %#v\n", time.Now().Format("2006-01-02 15:04:05"), response)
+	fmt.Printf("[%s] Response from 'listDomainRecords()' is %v\n", time.Now().Format("2006-01-02 15:04:05"), response)
 
 	var recordIds []string
 	for _, r := range response.DomainRecords.Record {
@@ -83,7 +83,7 @@ func deleteDomainRecord(client *alidns.Client, recordID string) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	fmt.Printf("[%s] Response from 'deleteDomainRecord()' is %#v\n", time.Now().Format("2006-01-02 15:04:05"), response)
+	fmt.Printf("[%s] Response from 'deleteDomainRecord()' is %v\n", time.Now().Format("2006-01-02 15:04:05"), response)
 }
 
 func main() {
@@ -121,10 +121,13 @@ func main() {
 		}
 
 		addDomainRecord(client, domainName, value)
+
+		// Sleep to make sure the change has time to propagate over to DNS
+		time.Sleep(30 * time.Second)
 	case "cleanup":
 		// 先获取所有记录类型为 TXT，且记录名包含 '_acme-challenge' 的记录 ID
 		recordIds := listDomainRecords(client, os.Getenv("CERTBOT_DOMAIN"))
-		fmt.Printf("[%s] All record Ids that need to delete is: %#v\n", time.Now().Format("2006-01-02 15:04:05"), recordIds)
+		fmt.Printf("[%s] All record Ids that need to delete is: %v\n", time.Now().Format("2006-01-02 15:04:05"), recordIds)
 
 		// 循环，删除它们
 		for _, id := range recordIds {
